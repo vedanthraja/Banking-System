@@ -6,7 +6,6 @@ from django.utils import timezone
 
 class customer(models.Model):
     pan = models.CharField(max_length = 10,primary_key = True)
-    #Pan regex can be added as input form validator or as database validator?
     fname = models.CharField(max_length = 15)
     mname = models.CharField(max_length = 15)
     lname = models.CharField(max_length = 15)
@@ -22,9 +21,6 @@ class cust_phone(models.Model):
     customer = models.ForeignKey(customer, on_delete = models.CASCADE)
     phno = models.CharField(max_length = 10)
 
-    def val_phone_no(self):
-        return len(self.phno) == 10
-
     def __str__(self):
         return self.phno
 
@@ -34,8 +30,6 @@ class account(models.Model):
     customer = models.ForeignKey(customer,default = "", on_delete = models.CASCADE)
     pin = models.PositiveSmallIntegerField()
     balance = models.DecimalField(max_digits = 12, decimal_places = 2)
-    def has_money(self):
-        return self.balance >= 0
 
     def __str__(self):
         return self.acct_no

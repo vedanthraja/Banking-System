@@ -7,8 +7,7 @@ class LoginForm(forms.ModelForm):
         model = account
         fields = ('acct_no', 'pin')
 
-class TransactionForm(forms.ModelForm):
-
-    class Meta:
-        model = trans_info
-        fields = ('amount', 'cred_acct_num')
+class TransactionForm(forms.Form):
+    amt = forms.DecimalField(label = 'Amount', max_digits = 12, decimal_places = 2)
+    credit_acct_no = forms.CharField(label = 'Credit Account Number', max_length = 13)
+    pin = forms.CharField(label = 'Account Pin',max_length = 6, widget = forms.PasswordInput())

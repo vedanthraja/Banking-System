@@ -23,15 +23,18 @@ def login_page(request):
 
 def acct_details(request, acct_no):
     if request.method == 'POST':
-        amount  = int(request.POST.get('amount'))
-        cred_acct_num = request.POST.get('cred_acct_num')
+        amount  = int(request.POST.get('amt'))
+        cred_acct_num = request.POST.get('credit_acct_no')
+        pin = request.POST.get('pin')
         cred_acct = account.objects.filter(acct_no=cred_acct_num).first()
         deb_acct = account.objects.get(acct_no=acct_no)
         if cred_acct is not None:
             if cred_acct.acct_no == deb_acct.acct_no:
                 messages.info(request, '* Invalid account number')
-            elif amount < 0:
-                messages.info(request, '* Invalid ammount')
+            elif amount <= 0:
+                messages.info(request, '* Invalid amount')
+            elif (int(pin) != int(deb_acct.pin)):
+                messages.info(request, '* Invalid Pin')
             elif deb_acct.balance >= amount:
                 deb_acct.balance = deb_acct.balance - amount
                 cred_acct.balance = cred_acct.balance + amount
@@ -55,6 +58,6 @@ def acct_statement(request, acct_no):
     q2 = trans_info.objects.filter(deb_acct_num = user_acct)
     q3 = trans_info.objects.filter(cred_acct_num = user_acct)
     q4 = (q2.union(q3))
-    q1 = q4.order_by('trans_date')
+    q1 = q4.order_by('-trans_date')
     return render(request,'bank/acct_statement.html',{'q1':q1,'user_acct':user_acct})
 
