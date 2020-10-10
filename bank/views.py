@@ -1,12 +1,45 @@
 from django.shortcuts import render, get_object_or_404
-from .models import account, trans_info
+from .models import customer, account, trans_info
 from django.utils import timezone
-from .forms import LoginForm, TransactionForm
+from .forms import LoginForm, TransactionForm, PinForm, NewCustomerForm
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-
+import random
 # Create your views here.
+def index(request):
+    return render(request,'bank/index.html')
+
+def create(request):
+
+    form = NewCustomerForm()
+
+    if request.method == "POST":
+        form = NewCustomerForm(request.POST)
+        if form.is_valid():
+            form.save(commit=True)
+            return redirect('pin_number',pan=form.instance.pan)
+
+        else:
+            messages.info(request,'Invalid Entry')
+            return redirect('create')
+
+    return render(request,'bank/create_account.html',{'form':form})
+
+def pinnumber(request,pan):
+
+    form1 = PinForm()
+    balance = 0
+    acct_no = random.randrange(64000000000,65000000000)
+
+    if request.method== "POST":
+        pin = request.POST.get('pin')
+        pann = customer.objects.filter(pan=pan).first()
+        t = account(acct_no=acct_no,customer=pann,pin=pin,balance=balance)
+        t.save()
+        return redirect('index')
+    return render(request,'bank/account_pin.html',{'form1':form1,'acct_no':acct_no})
+
 
 def login_page(request):
     if request.method == 'POST':

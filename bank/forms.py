@@ -1,5 +1,15 @@
 from django import forms
-from .models import account, trans_info
+from .models import customer, account, trans_info
+
+class NewCustomerForm(forms.ModelForm):
+    class Meta:
+        model = customer
+        fields = '__all__'
+
+class PinForm(forms.ModelForm):
+    class Meta:
+        model = account
+        fields = ('pin',)
 
 class LoginForm(forms.ModelForm):
 
