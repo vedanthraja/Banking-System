@@ -28,7 +28,7 @@ class cust_phone(models.Model):
 class account(models.Model):
     acct_no = models.CharField(max_length = 13, primary_key = True)
     customer = models.ForeignKey(customer,default = "", on_delete = models.CASCADE)
-    pin = models.PositiveSmallIntegerField()
+    pin = models.PositiveIntegerField()
     balance = models.DecimalField(max_digits = 12, decimal_places = 2)
 
     def __str__(self):

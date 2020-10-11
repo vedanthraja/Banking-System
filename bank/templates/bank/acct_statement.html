@@ -9,6 +9,7 @@
                     padding: 8px;
                     }
     </style>
+    {% if q1 %}
     <table>
         <tr>
             <th>Date & Time</th>
@@ -38,6 +39,9 @@
 
     {% endfor %}
     </table>
+    {% else %}
+    <h3>No statement to show</h3>
+    {% endif %}
     <h4>Current Balance: {{user_acct.balance}}</h4>
     <br>
     <button type="button" class="btn btn-default" onclick = window.print()>Print</button>

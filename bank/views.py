@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import customer, account, trans_info
 from django.utils import timezone
-from .forms import LoginForm, TransactionForm, PinForm, NewCustomerForm
+from .forms import LoginForm, TransactionForm, PinForm, NewCustomerForm, AddAcctForm
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
@@ -26,19 +26,34 @@ def create(request):
 
     return render(request,'bank/create_account.html',{'form':form})
 
+def cust_add_acct(request):
+    if request.method == 'POST':
+        pan = request.POST.get('pan')
+        fname = request.POST.get('fname')  
+        lname = request.POST.get('lname')
+        old_cust = customer.objects.filter(pan = pan, fname = fname, lname = lname).first()
+        if old_cust is not None:
+            return redirect(pinnumber,pan=pan)
+        else:
+            messages.info(request, '* No records found')
+            return redirect('cust_add_acct')
+    form1 = AddAcctForm()
+    return render(request, 'bank/add_acct_new.html',{'form1':form1})
+
 def pinnumber(request,pan):
 
     form1 = PinForm()
     balance = 0
     acct_no = random.randrange(64000000000,65000000000)
-
+    old_cust = customer.objects.get(pan = pan)
+    all_acct = account.objects.filter(customer = old_cust)
     if request.method== "POST":
         pin = request.POST.get('pin')
         pann = customer.objects.filter(pan=pan).first()
         t = account(acct_no=acct_no,customer=pann,pin=pin,balance=balance)
         t.save()
-        return redirect('index')
-    return render(request,'bank/account_pin.html',{'form1':form1,'acct_no':acct_no})
+        return redirect('login_page')
+    return render(request,'bank/account_pin.html',{'form1':form1,'acct_no':acct_no,'all_acct':all_acct})
 
 
 def login_page(request):
@@ -49,7 +64,7 @@ def login_page(request):
         if user is not None:
             return redirect('acct_details', acct_no=acct_no)
         else:
-            messages.info(request, '* Account No.(12 digit) or Pin(6 digit) is incorrect')
+            messages.info(request, '* Account No.(11 digit) or Pin is incorrect')
             return redirect('login_page')
     form = LoginForm()
     return render(request, 'bank/login_page.html', {'form':form})
